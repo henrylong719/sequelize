@@ -1,3 +1,4 @@
+import './index';
 export = {
   port: parseInt(process.env.PORT || '8080') || 8080,
   nodeEnv: process.env.NODE_ENV || 'production',
