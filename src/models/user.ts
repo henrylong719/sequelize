@@ -4,6 +4,15 @@ import environment from '../config/environment';
 import { Role } from './role';
 import { RefreshToken } from './refresh-token';
 
+export interface UserAttributes {
+  id?: number;
+  email: string;
+  password: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+}
+
 export default (sequelize: Sequelize) => {
   class User extends Model {
     password: string | undefined;

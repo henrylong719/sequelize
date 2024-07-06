@@ -5,7 +5,7 @@ import { Sequelize } from 'sequelize';
 let models = {} as any;
 
 export function registerModels(sequelize: Sequelize) {
-  const thisFile = path.basename(__filename); // index.js
+  const thisFile = path.basename(__filename); // index.ts
   const modelFiles = fs.readdirSync(__dirname);
   const filteredModelFiles = modelFiles.filter((file) => {
     return file !== thisFile && file.slice(-3) === '.ts';
