@@ -1,15 +1,28 @@
-import { DataTypes, Model, Sequelize } from 'sequelize';
+import { Model, DataTypes, Sequelize, ModelStatic } from 'sequelize';
 import bcrypt from 'bcrypt';
 import environment from '../config/environment';
+import { Role } from './role';
+import { RefreshToken } from './refresh-token';
 
 export default (sequelize: Sequelize) => {
   class User extends Model {
-    static associate(models) {
+    password: string | undefined;
+    comparePasswords:
+      | ((password: any) => Promise<Promise<boolean> & void>)
+      | undefined
+      | any;
+    static RefreshToken: any;
+    static Roles: any;
+
+    static associate(models: {
+      RefreshToken: ModelStatic<Model<any, any>>;
+      Role: ModelStatic<Model<any, any>>;
+    }) {
       User.RefreshToken = User.hasOne(models.RefreshToken);
       User.Roles = User.hasMany(models.Role);
     }
 
-    static async hashPassword(password: string) {
+    static async hashPassword(password: string | Buffer) {
       return bcrypt.hash(password, environment.saltRounds);
     }
 
@@ -21,17 +34,23 @@ export default (sequelize: Sequelize) => {
       firstName,
       lastName,
       refreshToken,
+    }: {
+      email: string;
+      password: string;
+      roles: Role[];
+      username: string;
+      firstName?: string;
+      lastName?: string;
+      refreshToken?: RefreshToken;
     }) {
-      return sequelize.transaction(async () => {
-        let rolesToSave = [];
+      return sequelize.transaction(() => {
+        let rolesToSave: { role: Role }[] = [];
 
-        // roles = ["customer","admin"]
-        // rolesToSave = [{role:"customer"},{role:"admin"}]
         if (roles && Array.isArray(roles)) {
           rolesToSave = roles.map((role) => ({ role }));
         }
 
-        await User.create(
+        return User.create(
           {
             email,
             password,
@@ -80,7 +99,7 @@ export default (sequelize: Sequelize) => {
         type: DataTypes.STRING(50),
         validate: {
           len: {
-            args: [2, 50],
+            args: [3, 50],
             msg: 'First name must contain between 3 and 50 characters',
           },
         },
@@ -89,7 +108,7 @@ export default (sequelize: Sequelize) => {
         type: DataTypes.STRING(50),
         validate: {
           len: {
-            args: [2, 50],
+            args: [3, 50],
             msg: 'Last name must contain between 3 and 50 characters',
           },
         },
@@ -108,12 +127,18 @@ export default (sequelize: Sequelize) => {
   );
 
   User.prototype.comparePasswords = async function (password: string) {
-    return bcrypt.compare(password, this.password);
+    return bcrypt.compare(password, this.password as string);
   };
 
   User.beforeSave(async (user, options) => {
-    const hashedPassword = await User.hashPassword(user.password);
-    user.password = hashedPassword;
+    if (user.password) {
+      const hashedPassword = await User.hashPassword(user.password);
+      user.password = hashedPassword;
+    }
+  });
+
+  User.afterCreate((user, options) => {
+    delete user.dataValues.password;
   });
 
   return User;
