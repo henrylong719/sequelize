@@ -4,7 +4,7 @@ type AsyncMiddleware = (
   req: Request,
   res: Response,
   next: NextFunction
-) => Promise<void>;
+) => Promise<any>;
 export default function asyncWrapper(callback: AsyncMiddleware) {
   return function (req: Request, res: Response, next: NextFunction) {
     callback(req, res, next).catch(next);
