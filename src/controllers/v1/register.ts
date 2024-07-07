@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import models from '../../models';
-import asyncWrapper from '../../../tests/utils/asyncWrapper';
+import asyncWrapper from '../../utils/asyncWrapper';
 import { JWTUtils } from '../../utils/jwt-utils';
 
 const router = Router();
