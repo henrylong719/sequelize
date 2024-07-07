@@ -42,6 +42,33 @@ describe('login', () => {
     expect(response.body.message).toEqual('Invalid credentials');
   });
 
+  it('should return 401 if we pass an empty email', async () => {
+    const response = await request(app)
+      .post('/v1/login')
+      .send({ email: '', password: 'Test123#' })
+      .expect(401);
+    expect(response.body.success).toEqual(false);
+    expect(response.body.message).toEqual('Invalid credentials');
+  });
+
+  it('should return 401 if we pass an empty password', async () => {
+    const response = await request(app)
+      .post('/v1/login')
+      .send({ email: 'test@example.net', password: '' })
+      .expect(401);
+    expect(response.body.success).toEqual(false);
+    expect(response.body.message).toEqual('Invalid credentials');
+  });
+
+  it('should return 401 if we pass an empty email and password', async () => {
+    const response = await request(app)
+      .post('/v1/login')
+      .send({ email: '', password: '' })
+      .expect(401);
+    expect(response.body.success).toEqual(false);
+    expect(response.body.message).toEqual('Invalid credentials');
+  });
+
   it('should return 401 if we pass an invalid password', async () => {
     const response = await request(app)
       .post('/v1/login')

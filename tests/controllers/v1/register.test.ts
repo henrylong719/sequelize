@@ -51,6 +51,15 @@ describe('register', () => {
     expect(newUser.RefreshToken.token).toEqual(expect.any(String));
   });
 
+  it('should return 401 if we pass an empty email', async () => {
+    const response = await request(app)
+      .post('/v1/register')
+      .send({ email: '' })
+      .expect(401);
+    expect(response.body.success).toEqual(false);
+    expect(response.body.message).toEqual('Invalid email');
+  });
+
   it('should not create a new user if it already exists', async () => {
     await request(app as Application)
       .post('/v1/register')

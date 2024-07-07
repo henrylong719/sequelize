@@ -10,6 +10,11 @@ router.post(
   '/register',
   asyncWrapper(async (req, res) => {
     const { email } = req.body;
+
+    if (!email) {
+      return res.status(401).send({ success: false, message: 'Invalid email' });
+    }
+
     const user = await User.findOne({ where: { email } });
 
     if (user) {
