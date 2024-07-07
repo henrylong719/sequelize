@@ -1,8 +1,6 @@
 import { Model, DataTypes, Sequelize, ModelStatic } from 'sequelize';
 
 export class RefreshToken extends Model {
-  public token!: string;
-
   static associate(models: { User: ModelStatic<Model<any, any>> }) {
     RefreshToken.belongsTo(models.User, {
       onDelete: 'CASCADE',

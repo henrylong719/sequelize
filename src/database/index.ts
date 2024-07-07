@@ -44,37 +44,33 @@ export default class Database {
     const namespace = cls.createNamespace('transactions-namespace');
     Sequelize.useCLS(namespace);
 
-    // Determine the configuration based on the environment
-    const config = this.dbConfig[this.environment];
-
     // Create the connection
-    this.sequelize = new Sequelize(
-      config.database,
-      config.username,
-      config.password,
-      {
-        host: config.host,
-        port: config.port,
-        dialect: config.dialect || 'postgres', // Default to 'postgres' if dialect is undefined
-        logging: this.environment === 'test' ? false : console.log,
-      }
-    );
+    const { username, password, host, port, database, dialect } =
+      this.dbConfig[this.environment];
+    this.sequelize = new Sequelize({
+      username,
+      password,
+      host,
+      port,
+      database,
+      dialect,
+      logging: this.environment ? false : console.log,
+    });
 
-    try {
-      await this.sequelize.authenticate();
+    // Check if we connected successfully
+    await this.sequelize.authenticate({ logging: false });
 
-      if (this.environment !== 'test') {
-        console.log('Connection has been established successfully.');
-      }
-
-      // Register the models
-      registerModels(this.sequelize);
-
-      // Sync the model
-      await this.sync();
-    } catch (error) {
-      console.error('Unable to connect to the database:', error);
+    if (!this.environment) {
+      console.log(
+        'Connection to the database has been established successfully'
+      );
     }
+
+    // Register the models
+    registerModels(this.sequelize);
+
+    // Sync the models
+    await this.sync();
   }
 
   async disconnect() {

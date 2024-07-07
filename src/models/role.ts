@@ -1,8 +1,6 @@
 import { Model, DataTypes, Sequelize, ModelStatic } from 'sequelize';
 
 export class Role extends Model {
-  public role!: string;
-
   static associate(models: { User: ModelStatic<Model<any, any>> }) {
     Role.belongsTo(models.User, { onDelete: 'CASCADE', onUpdate: 'CASCADE' });
   }

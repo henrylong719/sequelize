@@ -1,7 +1,6 @@
 import { Model, DataTypes, Sequelize, ModelStatic } from 'sequelize';
 import bcrypt from 'bcrypt';
 import environment from '../config/environment';
-import { Role } from './role';
 import { RefreshToken } from './refresh-token';
 
 export interface UserAttributes {
@@ -15,13 +14,13 @@ export interface UserAttributes {
 
 export default (sequelize: Sequelize) => {
   class User extends Model {
-    password: string | undefined;
-    comparePasswords:
+    declare password: string | undefined;
+    declare comparePasswords:
       | ((password: any) => Promise<Promise<boolean> & void>)
       | undefined
       | any;
-    static RefreshToken: any;
-    static Roles: any;
+    declare static RefreshToken: any;
+    declare static Roles: any;
 
     static associate(models: {
       RefreshToken: ModelStatic<Model<any, any>>;
@@ -46,14 +45,14 @@ export default (sequelize: Sequelize) => {
     }: {
       email: string;
       password: string;
-      roles: Role[];
+      roles: any[];
       username: string;
       firstName?: string;
       lastName?: string;
       refreshToken?: RefreshToken;
     }) {
       return sequelize.transaction(() => {
-        let rolesToSave: { role: Role }[] = [];
+        let rolesToSave: { role: any }[] = [];
 
         if (roles && Array.isArray(roles)) {
           rolesToSave = roles.map((role) => ({ role }));
@@ -108,7 +107,7 @@ export default (sequelize: Sequelize) => {
         type: DataTypes.STRING(50),
         validate: {
           len: {
-            args: [3, 50],
+            args: [2, 50],
             msg: 'First name must contain between 3 and 50 characters',
           },
         },
@@ -117,7 +116,7 @@ export default (sequelize: Sequelize) => {
         type: DataTypes.STRING(50),
         validate: {
           len: {
-            args: [3, 50],
+            args: [2, 50],
             msg: 'Last name must contain between 3 and 50 characters',
           },
         },
